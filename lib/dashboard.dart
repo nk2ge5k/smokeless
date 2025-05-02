@@ -40,8 +40,6 @@ class _DashboardState extends State<Dashboard> with StateHelper {
   final _statistics = Statistics();
 
   Future<void> _loadData() async {
-    if (!mounted) return;
-
     final now = DateTime.now();
 
     try {
@@ -80,10 +78,14 @@ class _DashboardState extends State<Dashboard> with StateHelper {
       return DateTime.now();
     }
 
-    final remaning = _todayLimit! - _todayCount;
+    final remaning = _remaning();
     final dayEnd = endOfDay(_latestSmoke!);
 
     if (remaning <= 0) {
+      if (_latestSmoke != null) {
+        final maxInterval = ((24 * 60 * 60) / (_todayLimit ?? 1)).round();
+        return _latestSmoke!.add(Duration(seconds: maxInterval));
+      }
       return dayEnd.add(Duration(minutes: 1));
     }
 
@@ -106,14 +108,14 @@ class _DashboardState extends State<Dashboard> with StateHelper {
     if (_latestSmoke == null || _todayLimit == null) {
       return "Whenever you're ready";
     }
+    return formatTime(_nextAllowed());
+  }
 
-    final remaning = _todayLimit! - _todayCount;
-    if (remaning <= 0) {
-      return "Not recommended";
+  int _remaning() {
+    if (_todayLimit == null) {
+      return 1;
     }
-
-    final next = _nextAllowed();
-    return formatTime(next);
+    return _todayLimit! - _todayCount;
   }
 
   // -- Actions --
@@ -198,8 +200,7 @@ class _DashboardState extends State<Dashboard> with StateHelper {
 
   Widget _widgetTodayGauge() {
     final count = _todayCount;
-    final remaning = _todayLimit == null ? 0 : _todayLimit! - count;
-    final bool isBelowTheLimit = _todayLimit != null && remaning > 0;
+    final bool isBelowTheLimit = _todayLimit != null && _remaning() > 0;
     final theme = Theme.of(context);
     final media = MediaQuery.of(context);
 
@@ -231,7 +232,8 @@ class _DashboardState extends State<Dashboard> with StateHelper {
                       ),
                       PieChartSectionData(
                         color: theme.highlightColor,
-                        value: remaning >= 0 ? remaning.toDouble() : 0,
+                        value:
+                            _todayLimit == null ? 0.0 : _remaning().toDouble(),
                         radius: 20,
                         showTitle: false,
                       ),
@@ -288,7 +290,9 @@ class _DashboardState extends State<Dashboard> with StateHelper {
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color:
-                                    DateTime.now().compareTo(_nextAllowed()) < 0
+                                    (DateTime.now().compareTo(_nextAllowed()) <
+                                                0 ||
+                                            _remaning() <= 0)
                                         ? Colors.red
                                         : Colors.black,
                               ),
@@ -378,7 +382,11 @@ class _DashboardState extends State<Dashboard> with StateHelper {
                   Navigator.push(
                     context,
                     MaterialPageRoute<void>(
-                      builder: (context) => Setup(isStartup: false),
+                      builder:
+                          (context) => Setup(
+                            isStartup: false,
+                            onSave: () => _loadData(),
+                          ),
                     ),
                   ),
                 },
@@ -426,13 +434,17 @@ class _DashboardState extends State<Dashboard> with StateHelper {
                                 ),
                                 HistoryChart(
                                   key: Key("history_$_latestSmoke"),
-                                  start: now.subtract(Duration(days: 7)),
-                                  end: now,
+                                  start: startOfDay(
+                                    now.subtract(Duration(days: 7)),
+                                  ),
+                                  end: endOfDay(now),
                                 ),
                                 IntervalsChart(
                                   key: Key("intervals_$_latestSmoke"),
-                                  start: now.subtract(Duration(days: 7)),
-                                  end: now,
+                                  start: startOfDay(
+                                    now.subtract(Duration(days: 7)),
+                                  ),
+                                  end: endOfDay(now),
                                 ),
                                 AdherenceChart(
                                   key: Key("adherence_$_latestSmoke"),

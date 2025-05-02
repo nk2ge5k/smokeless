@@ -40,7 +40,7 @@ class _HistoryChartState extends State<HistoryChart> with Loader<HistoryChart> {
           BarChartRodData(
             fromY: 0,
             toY: item.smoked.toDouble(),
-            color: Colors.grey,
+            color: Theme.of(context).primaryColor,
             borderRadius: radius,
           ),
         );

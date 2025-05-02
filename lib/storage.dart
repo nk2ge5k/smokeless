@@ -48,7 +48,7 @@ class Statistics {
       databasePath,
       onCreate: _initDatabase,
       onUpgrade: (db, oldVersion, newVersion) => _initDatabase(db, newVersion),
-      version: 3,
+      version: 6,
     );
   }
 
@@ -65,19 +65,8 @@ class Statistics {
 
     await db.execute("""
       CREATE TABLE IF NOT EXISTS limits (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
         -- Date in format YYYYMMDD
-        date INTEGER NOT NULL,
-        -- Limit
-        value INTEGER NOT NULL
-      );
-      """);
-
-    await db.execute("""
-      CREATE TABLE IF NOT EXISTS limits (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        -- Date in format YYYYMMDD
-        date INTEGER NOT NULL,
+        date INTEGER PRIMARY KEY NOT NULL,
         -- Limit
         value INTEGER NOT NULL
       );
@@ -341,7 +330,7 @@ class Statistics {
         final count = await countSmokesDuring(current);
         final limit = await limitForDate(current);
 
-        if (count != 0 && limit != null) {
+        if (count != 0) {
           result.add(
             StatisticsItem(date: current, smoked: count, limit: limit),
           );
@@ -392,7 +381,10 @@ class Statistics {
   // limitSave save limit for the given date
   Future<void> limitSave(DateTime date, int limit) async {
     final database = await _statistics.database;
-    await database.insert('limits', {'date': _dateToInt(date), 'value': limit});
+    await database.insert('limits', {
+      'date': _dateToInt(date),
+      'value': limit,
+    }, conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   Future<void> sleepHoursSave(int hours) async {

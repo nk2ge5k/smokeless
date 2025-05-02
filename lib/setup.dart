@@ -9,8 +9,9 @@ import 'package:smoke/dashboard.dart';
 
 class Setup extends StatefulWidget {
   final bool isStartup;
+  final void Function()? onSave;
 
-  const Setup({super.key, required this.isStartup});
+  const Setup({super.key, required this.isStartup, this.onSave});
 
   @override
   State<Setup> createState() => _SetupState();
@@ -92,6 +93,9 @@ class _SetupState extends State<Setup> with StateHelper {
     try {
       await _statistics.limitSave(DateTime.now(), limit);
       await _statistics.sleepHoursSave(sleepHours);
+
+      if (widget.onSave != null) widget.onSave!.call();
+
       _goBack();
     } catch (e) {
       debugPrint('Error saving settings: $e');
@@ -102,11 +106,11 @@ class _SetupState extends State<Setup> with StateHelper {
   void _goBack() {
     if (mounted) {
       if (Navigator.canPop(context)) {
-        Navigator.pop(context);
+        Navigator.pop(context, true);
       } else {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute<void>(builder: (context) => const Dashboard()),
+          MaterialPageRoute<void>(builder: (context) => Dashboard()),
         );
       }
     }
@@ -358,7 +362,7 @@ class _SetupState extends State<Setup> with StateHelper {
                                     horizontal: 30,
                                   ),
                                 ),
-                                child: const Text('Start'),
+                                child: Text(Navigator.canPop(context) ? 'Save' : 'Start'),
                               ),
                             ],
                           ),

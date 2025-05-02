@@ -3,6 +3,9 @@ import 'package:intl/intl.dart';
 
 DateTime startOfDay(DateTime date) => DateTime(date.year, date.month, date.day);
 DateTime endOfDay(DateTime date) => startOfDay(date).add(Duration(hours: 24));
+DateTime yesterday(DateTime date) =>
+    startOfDay(startOfDay(date).subtract(Duration(minutes: 1)));
+
 String formatTime(DateTime timestamp) => DateFormat('HH:mm').format(timestamp);
 String formatDate(DateTime timestamp) => DateFormat('E d').format(timestamp);
 
