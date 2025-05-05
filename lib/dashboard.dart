@@ -217,7 +217,7 @@ class _DashboardState extends State<Dashboard> with StateHelper {
                 PieChart(
                   PieChartData(
                     sectionsSpace: 4,
-                    centerSpaceRadius: media.size.width * 0.4,
+                    centerSpaceRadius: min(media.size.width * 0.4, 200),
                     startDegreeOffset: -90,
                     centerSpaceColor: theme.scaffoldBackgroundColor,
                     sections: [
