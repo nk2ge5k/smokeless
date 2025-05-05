@@ -74,73 +74,76 @@ class _HistoryChartState extends State<HistoryChart> with Loader<HistoryChart> {
           'past 7 days. It helps you track smoking patterns throughout the '
           'week and monitor your progress toward consumption goals.',
       isLoading: isLoading,
-      child: BarChart(
-        BarChartData(
-          minY: 0,
-          maxY: maxY.toDouble(),
-          gridData: FlGridData(
-            show: true,
-            drawHorizontalLine: true,
-            drawVerticalLine: false,
-          ),
-          barTouchData: BarTouchData(
-            touchTooltipData: BarTouchTooltipData(
-              direction: TooltipDirection.top,
-              getTooltipItem: (
-                BarChartGroupData group,
-                int groupIndex,
-                BarChartRodData rod,
-                int rodIndex,
-              ) {
-                final item = data[groupIndex];
-                final textStyle = TextStyle(
-                  color: theme.colorScheme.onPrimary,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                );
-                return BarTooltipItem(
-                  item.limit == null
-                      ? "${formatDate(item.date)}\n ${item.smoked} cigarettes"
-                      : "${formatDate(item.date)}\n ${item.smoked}/${item.limit!} cigarettes",
-                  textStyle,
-                );
-              },
-            ),
-          ),
-          titlesData: FlTitlesData(
-            leftTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                reservedSize: 25,
-                getTitlesWidget:
-                    (value, meta) => Text((value.toInt()).toString()),
+      child:
+          (data.isEmpty)
+              ? const Center(child: Text("No data to display yet"))
+              : BarChart(
+                BarChartData(
+                  minY: 0,
+                  maxY: maxY.toDouble(),
+                  gridData: FlGridData(
+                    show: true,
+                    drawHorizontalLine: true,
+                    drawVerticalLine: false,
+                  ),
+                  barTouchData: BarTouchData(
+                    touchTooltipData: BarTouchTooltipData(
+                      direction: TooltipDirection.top,
+                      getTooltipItem: (
+                        BarChartGroupData group,
+                        int groupIndex,
+                        BarChartRodData rod,
+                        int rodIndex,
+                      ) {
+                        final item = data[groupIndex];
+                        final textStyle = TextStyle(
+                          color: theme.colorScheme.onPrimary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        );
+                        return BarTooltipItem(
+                          item.limit == null
+                              ? "${formatDate(item.date)}\n ${item.smoked} cigarettes"
+                              : "${formatDate(item.date)}\n ${item.smoked}/${item.limit!} cigarettes",
+                          textStyle,
+                        );
+                      },
+                    ),
+                  ),
+                  titlesData: FlTitlesData(
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 25,
+                        getTitlesWidget:
+                            (value, meta) => Text((value.toInt()).toString()),
+                      ),
+                    ),
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget:
+                            (value, meta) =>
+                                Text(data[value.toInt()].date.day.toString()),
+                      ),
+                    ),
+                    topTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    rightTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                  ),
+                  borderData: FlBorderData(
+                    show: true,
+                    border: Border(
+                      left: BorderSide(width: 1, color: theme.highlightColor),
+                      bottom: BorderSide(width: 1, color: theme.highlightColor),
+                    ),
+                  ),
+                  barGroups: _buildBars(),
+                ),
               ),
-            ),
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                getTitlesWidget:
-                    (value, meta) =>
-                        Text(data[value.toInt()].date.day.toString()),
-              ),
-            ),
-            topTitles: const AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
-            ),
-            rightTitles: const AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
-            ),
-          ),
-          borderData: FlBorderData(
-            show: true,
-            border: Border(
-              left: BorderSide(width: 1, color: theme.highlightColor),
-              bottom: BorderSide(width: 1, color: theme.highlightColor),
-            ),
-          ),
-          barGroups: _buildBars(),
-        ),
-      ),
     );
   }
 }

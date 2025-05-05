@@ -76,77 +76,82 @@ class _IntervalsChartState extends State<IntervalsChart>
           'each day of the week. It helps you monitor your daily smoking '
           'patterns and track progress in extending the time between cigarettes.',
       isLoading: isLoading,
-      child: BarChart(
-        BarChartData(
-          minY: minY,
-          maxY: maxY,
-          gridData: FlGridData(
-            show: true,
-            drawHorizontalLine: true,
-            drawVerticalLine: false,
-          ),
-          barTouchData: BarTouchData(
-            touchTooltipData: BarTouchTooltipData(
-              direction: TooltipDirection.top,
-              getTooltipItem: (
-                BarChartGroupData group,
-                int groupIndex,
-                BarChartRodData rod,
-                int rodIndex,
-              ) {
-                final item = data[groupIndex];
-                final textStyle = TextStyle(
-                  color: theme.colorScheme.onPrimary,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                );
-                return BarTooltipItem(
-                  "${formatDate(item.date)}\n ${item.interval.inMinutes} minutes",
-                  textStyle,
-                );
-              },
-            ),
-          ),
-          titlesData: FlTitlesData(
-            leftTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                reservedSize: 25,
-                getTitlesWidget: (double value, TitleMeta meta) {
-                  return (value == 0 || value == meta.max || value == meta.min)
-                      ? Text(
-                        "${value.abs().toInt()} min",
-                        textScaler: TextScaler.linear(0.5),
-                      )
-                      : SizedBox.shrink();
-                },
+      child:
+          (data.isEmpty)
+              ? const Center(child: Text("No data to display yet"))
+              : BarChart(
+                BarChartData(
+                  minY: minY,
+                  maxY: maxY,
+                  gridData: FlGridData(
+                    show: true,
+                    drawHorizontalLine: true,
+                    drawVerticalLine: false,
+                  ),
+                  barTouchData: BarTouchData(
+                    touchTooltipData: BarTouchTooltipData(
+                      direction: TooltipDirection.top,
+                      getTooltipItem: (
+                        BarChartGroupData group,
+                        int groupIndex,
+                        BarChartRodData rod,
+                        int rodIndex,
+                      ) {
+                        final item = data[groupIndex];
+                        final textStyle = TextStyle(
+                          color: theme.colorScheme.onPrimary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        );
+                        return BarTooltipItem(
+                          "${formatDate(item.date)}\n ${item.interval.inMinutes} minutes",
+                          textStyle,
+                        );
+                      },
+                    ),
+                  ),
+                  titlesData: FlTitlesData(
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 25,
+                        getTitlesWidget: (double value, TitleMeta meta) {
+                          return (value == 0 ||
+                                  value == meta.max ||
+                                  value == meta.min)
+                              ? Text(
+                                "${value.abs().toInt()} min",
+                                textScaler: TextScaler.linear(0.5),
+                              )
+                              : SizedBox.shrink();
+                        },
+                      ),
+                    ),
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget:
+                            (value, meta) =>
+                                Text(data[value.toInt()].date.day.toString()),
+                      ),
+                    ),
+                    topTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    rightTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                  ),
+                  borderData: FlBorderData(
+                    show: true,
+                    border: Border(
+                      left: BorderSide(width: 1, color: theme.highlightColor),
+                      bottom: BorderSide(width: 1, color: theme.highlightColor),
+                    ),
+                  ),
+                  barGroups: _buildBars(),
+                ),
               ),
-            ),
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                getTitlesWidget:
-                    (value, meta) =>
-                        Text(data[value.toInt()].date.day.toString()),
-              ),
-            ),
-            topTitles: const AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
-            ),
-            rightTitles: const AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
-            ),
-          ),
-          borderData: FlBorderData(
-            show: true,
-            border: Border(
-              left: BorderSide(width: 1, color: theme.highlightColor),
-              bottom: BorderSide(width: 1, color: theme.highlightColor),
-            ),
-          ),
-          barGroups: _buildBars(),
-        ),
-      ),
     );
   }
 }

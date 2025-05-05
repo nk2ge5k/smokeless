@@ -58,80 +58,86 @@ class _AverageTimeChartState extends State<AverageTimeChart>
           'This chart displays your average cigarette consumption throughout '
           'the day, broken down by hour.',
       isLoading: isLoading,
-      child: BarChart(
-        BarChartData(
-          minY: 0,
-          maxY: maxY.toDouble(),
-          groupsSpace: 0,
-          gridData: FlGridData(
-            show: true,
-            drawVerticalLine: false,
-            drawHorizontalLine: true,
-            checkToShowHorizontalLine: (value) => value == 0,
-            getDrawingHorizontalLine: (value) {
-              return FlLine(strokeWidth: 1, color: theme.highlightColor);
-            },
-          ),
-          barTouchData: BarTouchData(
-            touchTooltipData: BarTouchTooltipData(
-              direction: TooltipDirection.top,
-              getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                final start = groupIndex.toInt();
-                final end = start == 23 ? 0 : start + 1;
-                final count = data[start] ?? 0;
-
-                final startHour = start.toString().padLeft(2, '0');
-                final endHour = end.toString().padLeft(2, '0');
-
-                return BarTooltipItem(
-                  "$startHour:00 - $endHour:00\n$count cigarettes",
-                  TextStyle(
-                    color: theme.colorScheme.onPrimary,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
+      child:
+          (data.isEmpty)
+              ? const Center(child: Text("No data to display yet"))
+              : BarChart(
+                BarChartData(
+                  minY: 0,
+                  maxY: maxY.toDouble(),
+                  groupsSpace: 0,
+                  gridData: FlGridData(
+                    show: true,
+                    drawVerticalLine: false,
+                    drawHorizontalLine: true,
+                    checkToShowHorizontalLine: (value) => value == 0,
+                    getDrawingHorizontalLine: (value) {
+                      return FlLine(
+                        strokeWidth: 1,
+                        color: theme.highlightColor,
+                      );
+                    },
                   ),
-                );
-              },
-            ),
-          ),
-          titlesData: FlTitlesData(
-            leftTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                reservedSize: 25,
-                getTitlesWidget: (value, meta) => SizedBox.shrink(),
+                  barTouchData: BarTouchData(
+                    touchTooltipData: BarTouchTooltipData(
+                      direction: TooltipDirection.top,
+                      getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                        final start = groupIndex.toInt();
+                        final end = start == 23 ? 0 : start + 1;
+                        final count = data[start] ?? 0;
+
+                        final startHour = start.toString().padLeft(2, '0');
+                        final endHour = end.toString().padLeft(2, '0');
+
+                        return BarTooltipItem(
+                          "$startHour:00 - $endHour:00\n$count cigarettes",
+                          TextStyle(
+                            color: theme.colorScheme.onPrimary,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  titlesData: FlTitlesData(
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 25,
+                        getTitlesWidget: (value, meta) => SizedBox.shrink(),
+                      ),
+                    ),
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: (double value, TitleMeta meta) {
+                          if (value.toInt() % 6 == 0) {
+                            return (value == 24)
+                                ? Text("(h)")
+                                : Text(value.toInt().toString());
+                          }
+                          return SizedBox.shrink();
+                        },
+                      ),
+                    ),
+                    topTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    rightTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                  ),
+                  borderData: FlBorderData(
+                    show: true,
+                    border: Border(
+                      left: BorderSide(width: 1, color: theme.highlightColor),
+                      bottom: BorderSide(width: 1, color: theme.highlightColor),
+                    ),
+                  ),
+                  barGroups: _buildBars(),
+                ),
               ),
-            ),
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                getTitlesWidget: (double value, TitleMeta meta) {
-                  if (value.toInt() % 6 == 0) {
-                    return (value == 24)
-                        ? Text("(h)")
-                        : Text(value.toInt().toString());
-                  }
-                  return SizedBox.shrink();
-                },
-              ),
-            ),
-            topTitles: const AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
-            ),
-            rightTitles: const AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
-            ),
-          ),
-          borderData: FlBorderData(
-            show: true,
-            border: Border(
-              left: BorderSide(width: 1, color: theme.highlightColor),
-              bottom: BorderSide(width: 1, color: theme.highlightColor),
-            ),
-          ),
-          barGroups: _buildBars(),
-        ),
-      ),
     );
   }
 }
