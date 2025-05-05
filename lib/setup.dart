@@ -362,7 +362,9 @@ class _SetupState extends State<Setup> with StateHelper {
                                     horizontal: 30,
                                   ),
                                 ),
-                                child: Text(Navigator.canPop(context) ? 'Save' : 'Start'),
+                                child: Text(
+                                  Navigator.canPop(context) ? 'Save' : 'Start',
+                                ),
                               ),
                             ],
                           ),

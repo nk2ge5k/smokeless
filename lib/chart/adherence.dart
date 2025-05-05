@@ -93,7 +93,7 @@ class _AdherenceChartState extends State<AdherenceChart>
     );
 
     return Chart(
-      chartHeight: 150,
+      chartHeight: 200,
       title: 'Schedule Adherence',
       description:
           'This visualization helps track how closely your actual smoking '

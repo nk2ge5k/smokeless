@@ -226,7 +226,7 @@ class _DashboardState extends State<Dashboard> with StateHelper {
                             isBelowTheLimit
                                 ? theme.primaryColor
                                 : Colors.redAccent,
-                        value: count.toDouble(),
+                        value: min(count, _todayLimit ?? count).toDouble(),
                         radius: 25,
                         showTitle: false,
                       ),

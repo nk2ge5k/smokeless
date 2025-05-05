@@ -34,35 +34,25 @@ class _HistoryChartState extends State<HistoryChart> with Loader<HistoryChart> {
 
     for (var i = 0; i < data.length; i++) {
       final item = data[i];
-      List<BarChartRodData> rods = [];
-      if (item.limit == null) {
-        rods.add(
-          BarChartRodData(
-            fromY: 0,
-            toY: item.smoked.toDouble(),
-            color: Theme.of(context).primaryColor,
-            borderRadius: radius,
-          ),
-        );
-      } else {
-        rods.add(
-          BarChartRodData(
-            fromY: 0,
-            toY: item.limit!.toDouble(),
-            color: Colors.red,
-            borderRadius: radius,
-          ),
-        );
-        rods.add(
-          BarChartRodData(
-            fromY: 0,
-            toY: item.smoked.toDouble(),
-            color: Theme.of(context).primaryColor,
-            borderRadius: radius,
-          ),
-        );
-      }
-      bars.add(BarChartGroupData(x: i, barRods: rods));
+      bars.add(
+        BarChartGroupData(
+          x: i,
+          barRods: [
+            BarChartRodData(
+              fromY: 0,
+              toY: item.limit?.toDouble() ?? 0,
+              color: Colors.red,
+              borderRadius: radius,
+            ),
+            BarChartRodData(
+              fromY: 0,
+              toY: item.smoked.toDouble(),
+              color: Theme.of(context).primaryColor,
+              borderRadius: radius,
+            ),
+          ],
+        ),
+      );
     }
 
     return bars;
@@ -130,7 +120,8 @@ class _HistoryChartState extends State<HistoryChart> with Loader<HistoryChart> {
               sideTitles: SideTitles(
                 showTitles: true,
                 getTitlesWidget:
-                    (value, meta) => Text(formatDate(data[value.toInt()].date)),
+                    (value, meta) =>
+                        Text(data[value.toInt()].date.day.toString()),
               ),
             ),
             topTitles: const AxisTitles(

@@ -126,7 +126,8 @@ class _IntervalsChartState extends State<IntervalsChart>
               sideTitles: SideTitles(
                 showTitles: true,
                 getTitlesWidget:
-                    (value, meta) => Text(formatDate(data[value.toInt()].date)),
+                    (value, meta) =>
+                        Text(data[value.toInt()].date.day.toString()),
               ),
             ),
             topTitles: const AxisTitles(
